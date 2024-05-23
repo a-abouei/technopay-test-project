@@ -3,6 +3,7 @@
 namespace App\Dtos;
 
 use App\Exceptions\NotFoundDtoPropertyException;
+use Exception;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionProperty;
@@ -79,6 +80,7 @@ class BaseDto
      * @param string $name
      * @param mixed $value
      * @return void
+     * @throws Exception
      */
     public function setProp(string $name, mixed $value): void
     {
