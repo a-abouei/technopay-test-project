@@ -6,6 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('backoffice')->group(function (){
 
-        Route::get('orders', [OrderController::class, 'index']);
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
 
     });
