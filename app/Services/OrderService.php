@@ -5,6 +5,8 @@ namespace App\Services;
 
 use App\Http\Requests\IndexOrdersRequest;
 use App\Repositories\OrderRepository;
+use App\Services\NotificationService\Notification;
+use Throwable;
 
 class OrderService
 {
@@ -16,23 +18,32 @@ class OrderService
     /**
      * @param IndexOrdersRequest $request
      * @return array
+     * @throws Throwable
      */
     public function getOrdersList(IndexOrdersRequest $request): array
     {
-        $orders = $this->orderRepository->getOrdersList($request);
+        try {
+            $orders = $this->orderRepository->getOrdersList($request);
 
-        $data = [];
+            $data = [];
 
-        foreach ($orders as $order) {
-            $data[] = [
-                'order_id' => $order->orderId,
-                'customer_id' => $order->customerId,
-                'status' => $order->status,
-                'amount' => $order->amount
-            ];
+            foreach ($orders as $order) {
+                $data[] = [
+                    'order_id' => $order->orderId,
+                    'customer_id' => $order->customerId,
+                    'status' => $order->status,
+                    'amount' => $order->amount
+                ];
+            }
+
+            return $data;
         }
+        catch (Throwable $th){
+            Notification::sms()->messageByTemplate('filter_order')->send();
+            Notification::email()->messageByTemplate('filter_order')->send();
 
-        return $data;
+            throw $th;
+        }
     }
 
 }
