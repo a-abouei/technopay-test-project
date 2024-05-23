@@ -213,4 +213,40 @@ class OrderControllerTest extends TestCase
 
     }
 
+    public function testGetOrdersWithMinAndMaxAmountFilterWhenUseAtThemSameTime(): void
+    {
+        Order::factory()->count(2)
+            ->state([
+                'amount' => 25000
+            ])->create();
+        Order::factory()->count(3)
+            ->state([
+                'amount' => 38000
+            ])->create();
+        Order::factory()->count(4)
+            ->state([
+                'amount' => 92000
+            ])->create();
+        Order::factory()->count(5)
+            ->state([
+                'amount' => 46000
+            ])->create();
+
+
+        $response = $this->getJson(route('orders.index', [
+            'order_min_amount' => 26000,
+            'order_max_amount' => 50000
+        ]));
+
+        $response->assertOk();
+
+        $this->assertCount(8, $response->json('data'));
+        $response->assertJson([
+                'message' => 'list of orders found successfully',
+                'data' => []
+            ]
+        );
+
+    }
+
 }
