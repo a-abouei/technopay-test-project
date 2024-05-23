@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id');
-            $table->enum('status', ['INIT', 'IN_PROGRESS', 'FAILED', 'SUCCEED'])->default('INIT');
+            $table->enum('status', [
+                'INIT', 'IN_PROGRESS', 'FAILED', 'SUCCEED'
+            ])->default('INIT');
             $table->decimal('amount', 20, 0);
             $table->timestamps();
 
