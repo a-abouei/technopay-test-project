@@ -26,10 +26,10 @@ class IndexOrdersRequest extends FormRequest
     {
         return [
             'customer_national_code' => ['nullable', 'string'],
-            'customer_mobile_number' => ['nullable', 'string', 'mobile'],
-            'min_amount' => ['nullable', 'numeric'],
-            'max_amount' => ['nullable', 'numeric'],
-            'status' => ['nullable', 'string', new Enum(OrderStatus::class)]
+            'customer_mobile_number' => ['nullable', 'string', 'regex:/^(\+?[\d\s-]{7,15})$/'],
+            'order_min_amount' => ['nullable', 'numeric'],
+            'order_max_amount' => ['nullable', 'numeric'],
+            'order_status' => ['nullable', 'string', new Enum(OrderStatus::class)]
         ];
     }
 }

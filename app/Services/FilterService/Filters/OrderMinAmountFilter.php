@@ -5,7 +5,7 @@ namespace App\Services\FilterService\Filters;
 use App\Contracts\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
 
-class OrderAmountFilter implements FilterInterface
+class OrderMinAmountFilter implements FilterInterface
 {
 
     /**
@@ -15,6 +15,6 @@ class OrderAmountFilter implements FilterInterface
      */
     public function apply(Builder $builder, $value): Builder
     {
-        return $builder->where('orders.amount', $value);
+        return $builder->where('orders.amount', '>=',$value);
     }
 }

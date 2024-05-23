@@ -19,11 +19,12 @@ class FilterServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('filter.classes', function () {
-            $filterPath = app_path('Services/FilterService');
+            $filterPath = app_path('Services/FilterService/Filters');
             $files = File::allFiles($filterPath);
 
             foreach ($files as $file) {
                 $class = 'App\Services\FilterService\Filters\\' . Str::replaceLast('.php', '', $file->getFilename());
+
                 if (class_exists($class)){
                     $fileInterface = new $class;
                     if (method_exists($fileInterface, 'apply')) {
@@ -32,6 +33,7 @@ class FilterServiceProvider extends ServiceProvider
                     }
                 }
             }
+
             return $this->filters;
         });
     }

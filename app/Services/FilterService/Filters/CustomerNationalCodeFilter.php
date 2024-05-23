@@ -13,7 +13,7 @@ class CustomerNationalCodeFilter implements FilterInterface
      */
     public function apply(Builder $builder, $value): Builder
     {
-        return $builder->join('customers', 'orders.customer_id', '=', 'customers.id')
-            ->where('customers.national_code', $value);
+        return $builder->join('customers as customer2', 'orders.customer_id', '=', 'customer2.id')
+            ->where('customer2.national_code', $value);
     }
 }
