@@ -21,7 +21,7 @@ class CustomerFactory extends Factory
             Customer::FIRST_NAME => $this->faker->firstName,
             Customer::LAST_NAME => $this->faker->lastName,
             Customer::NATIONAL_CODE => $this->faker->unique()->randomNumber(9),
-            Customer::MOBILE_NUMBER => $this->faker->unique()->phoneNumber,
+            Customer::MOBILE_NUMBER => $this->faker->e164PhoneNumber(),
         ];
     }
 }

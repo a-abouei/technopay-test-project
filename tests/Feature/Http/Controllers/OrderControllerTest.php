@@ -3,10 +3,9 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Enums\OrderStatus;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
-use HttpResponse;
-use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class OrderControllerTest extends TestCase
@@ -241,6 +240,220 @@ class OrderControllerTest extends TestCase
         $response->assertOk();
 
         $this->assertCount(8, $response->json('data'));
+        $response->assertJson([
+                'message' => 'list of orders found successfully',
+                'data' => []
+            ]
+        );
+
+    }
+
+
+    public function testGetOrdersWithCustomerNationalCodeFilterRespondSuccessfully(): void
+    {
+        $desireCustomer = Customer::factory()->count(5)->create()->first();
+
+        Order::factory()->count(6)
+            ->state([
+                'customer_id' => 1,
+                'amount' => 25000
+            ])->create();
+        Order::factory()->count(3)
+            ->state([
+                'customer_id' => 2,
+                'amount' => 38000
+            ])->create();
+        Order::factory()->count(4)
+            ->state([
+                'customer_id' => 3,
+                'amount' => 92000
+            ])->create();
+        Order::factory()->count(5)
+            ->state([
+                'customer_id' => 4,
+                'amount' => 46000
+            ])->create();
+        Order::factory()->count(2)
+            ->state([
+                'customer_id' => 5,
+                'amount' => 46000
+            ])->create();
+
+
+        $response = $this->getJson(route('orders.index', [
+            'customer_national_code' => $desireCustomer->national_code,
+        ]));
+
+        $response->assertOk();
+
+        $this->assertCount(6, $response->json('data'));
+        $response->assertJson([
+                'message' => 'list of orders found successfully',
+                'data' => []
+            ]
+        );
+        $response->assertJsonFragment([
+            'customer_id' => $desireCustomer->id
+        ]);
+
+    }
+
+    public function testGetOrdersWithCustomerMobileNumberFilterRespondSuccessfully(): void
+    {
+        Customer::factory()->count(5)->create()->first();
+
+        Order::factory()->count(6)
+            ->state([
+                'customer_id' => 1,
+                'amount' => 25000
+            ])->create();
+
+        Order::factory()->count(3)
+            ->state([
+                'customer_id' => 2,
+                'amount' => 38000
+            ])->create();
+
+        Order::factory()->count(4)
+            ->state([
+                'customer_id' => 3,
+                'amount' => 92000
+            ])->create();
+
+        Order::factory()->count(5)
+            ->state([
+                'customer_id' => 4,
+                'amount' => 46000
+            ])->create();
+
+        Order::factory()->count(2)
+            ->state([
+                'customer_id' => 5,
+                'amount' => 46000
+            ])->create();
+
+        $customer = Customer::query()->find(5);
+
+        $response = $this->getJson(route('orders.index', [
+            'customer_mobile_number' => $customer->mobile_number,
+        ]));
+
+        $response->assertOk();
+
+        $this->assertCount(2, $response->json('data'));
+        $response->assertJson([
+                'message' => 'list of orders found successfully',
+                'data' => []
+            ]
+        );
+        $response->assertJsonFragment([
+            'customer_id' => $customer->id
+        ]);
+
+    }
+
+
+    public function testGetOrdersWithCustomerMobileNumberAndNationalCodeFilterTogetherBaseOnSameCustomerRespondSuccessfully(): void
+    {
+        Customer::factory()->count(5)->create()->first();
+
+        Order::factory()->count(6)
+            ->state([
+                'customer_id' => 1,
+                'amount' => 25000
+            ])->create();
+
+        Order::factory()->count(3)
+            ->state([
+                'customer_id' => 2,
+                'amount' => 38000
+            ])->create();
+
+        Order::factory()->count(4)
+            ->state([
+                'customer_id' => 3,
+                'amount' => 92000
+            ])->create();
+
+        Order::factory()->count(5)
+            ->state([
+                'customer_id' => 4,
+                'amount' => 46000
+            ])->create();
+
+        Order::factory()->count(2)
+            ->state([
+                'customer_id' => 5,
+                'amount' => 46000
+            ])->create();
+
+        $customer = Customer::query()->find(5);
+
+        $response = $this->getJson(route('orders.index', [
+            'customer_national_code' => $customer->national_code,
+            'customer_mobile_number' => $customer->mobile_number,
+        ]));
+
+        $response->assertOk();
+
+        $this->assertCount(2, $response->json('data'));
+        $response->assertJson([
+                'message' => 'list of orders found successfully',
+                'data' => []
+            ]
+        );
+        $response->assertJsonFragment([
+            'customer_id' => $customer->id
+        ]);
+
+    }
+
+
+    public function testGetOrdersWithCustomerMobileNumberAndNationalCodeFilterTogetherBaseOnDifferentCustomersRespondSuccessfully(): void
+    {
+        Customer::factory()->count(5)->create()->first();
+
+        Order::factory()->count(6)
+            ->state([
+                'customer_id' => 1,
+                'amount' => 25000
+            ])->create();
+
+        Order::factory()->count(3)
+            ->state([
+                'customer_id' => 2,
+                'amount' => 38000
+            ])->create();
+
+        Order::factory()->count(4)
+            ->state([
+                'customer_id' => 3,
+                'amount' => 92000
+            ])->create();
+
+        Order::factory()->count(5)
+            ->state([
+                'customer_id' => 4,
+                'amount' => 46000
+            ])->create();
+
+        Order::factory()->count(2)
+            ->state([
+                'customer_id' => 5,
+                'amount' => 46000
+            ])->create();
+
+        $customer = Customer::query()->find(5);
+        $customer2 = Customer::query()->find(1);
+
+        $response = $this->getJson(route('orders.index', [
+            'customer_national_code' => $customer->national_code,
+            'customer_mobile_number' => $customer2->mobile_number,
+        ]));
+
+        $response->assertOk();
+
+        $this->assertCount(0, $response->json('data'));
         $response->assertJson([
                 'message' => 'list of orders found successfully',
                 'data' => []
